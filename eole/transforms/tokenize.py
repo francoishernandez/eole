@@ -497,10 +497,14 @@ class ONMTTokenizerTransform(TokenizerTransform):
     def tokenize_string(self, sentence, side="src", is_train=False):
         tokenizer = self.load_models[side]
         if self.gpt2_pretok:
+            # patch for llama3 special tokens
+            sentence = re.sub(r"<\|([^|]*)\|>", "\uff5f\\1\uff60", sentence)
             sentence = "".join(
                 self.maptable[b]
                 for b in sentence.replace(DefaultTokens.SEP, "\n").encode("utf-8")
             )
+            # patch for llama3 special tokens (retrieve pyonmttok placeholder chars)
+            sentence = sentence.replace("ï½Ł", "\uff5f").replace("ï½ł", "\uff60")
             segmented1 = tokenizer(sentence)
             segmented = []
             # ugly patch to make sure "\n\n" is split in two items

@@ -1,5 +1,6 @@
 #!/usr/bin/env python
 import os
+import re
 import json
 import torch
 import pyonmttok
@@ -944,6 +945,11 @@ class LlamaHFConverter(BaseBin):
             if "<|end_of_text|>" in vocab:
                 index = vocab.index("<|end_of_text|>")
                 vocab[index] = DefaultTokens.EOS
+
+            # patch special tokens with pyonmttok compatible placeholders
+            vocab = [
+                re.sub(r"<\|([^|]*)\|>", "\uff5f\\1\uff60", token) for token in vocab
+            ]
 
             src_vocab = pyonmttok.build_vocab_from_tokens(vocab)
 
