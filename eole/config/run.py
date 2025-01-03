@@ -164,7 +164,7 @@ class PredictConfig(
             self.__dict__["share_vocab"] = config_dict.get("share_vocab", False)
             # retrieve precision from checkpoint config if not explicitly set
             if "compute_dtype" not in self.model_fields_set:
-                self.update(compute_dtype=training_config.compute_dtype)
+                self.compute_dtype = training_config.compute_dtype
             # quant logic, might be better elsewhere
             if hasattr(
                 training_config, "quant_type"
@@ -201,7 +201,7 @@ class PredictConfig(
                 **config_dict.get("transforms_configs", {})
             )
         if "compute_dtype" not in self.model_fields_set:
-            update_dict["compute_dtype"] = config_dict.get("training", {}).get(
+            self.compute_dtype = config_dict.get("training", {}).get(
                 "compute_dtype", "fp16"
             )
         for key, value in config_dict.get("inference", {}).items():
