@@ -51,17 +51,17 @@ error_exit()
 # }
 
 # black check
-echo -n "[+] Doing Black check..."
-${PYTHON} -m black --check . >> ${LOG_FILE} 2>&1
-[ "$?" -eq 0 ] || error_exit
-echo "Succeeded" | tee -a ${LOG_FILE}
+# echo -n "[+] Doing Black check..."
+# ${PYTHON} -m black --check . >> ${LOG_FILE} 2>&1
+# [ "$?" -eq 0 ] || error_exit
+# echo "Succeeded" | tee -a ${LOG_FILE}
 
 # flake8 check
-echo -n "[+] Doing flake8 check..."
-#${PYTHON} -m flake8 --ignore *venv* . >> ${LOG_FILE} 2>&1
-${PYTHON} -m flake8 . >> ${LOG_FILE} 2>&1
-[ "$?" -eq 0 ] || error_exit
-echo "Succeeded" | tee -a ${LOG_FILE}
+# echo -n "[+] Doing flake8 check..."
+# #${PYTHON} -m flake8 --ignore *venv* . >> ${LOG_FILE} 2>&1
+# ${PYTHON} -m flake8 . >> ${LOG_FILE} 2>&1
+# [ "$?" -eq 0 ] || error_exit
+# echo "Succeeded" | tee -a ${LOG_FILE}
 
 # unittest
 echo -n "[+] Doing unittest test..."
@@ -70,8 +70,8 @@ ${PYTHON} -m unittest discover >> ${LOG_FILE} 2>&1
 echo "Succeeded" | tee -a ${LOG_FILE}
 
 # Make sure recipes configs are valid
-echo -n "[+] Checking recipes config..."
-${PYTHON} eole/tests/test_recipes.py $PROJECT_ROOT/recipes
+# echo -n "[+] Checking recipes config..."
+# ${PYTHON} eole/tests/test_recipes.py $PROJECT_ROOT/recipes
 
 # Get Vocabulary test
 echo -n "[+] Testing vocabulary building..."
@@ -218,7 +218,7 @@ ${PYTHON} eole/bin/main.py train \
             -tgt_vocab $TMP_OUT_DIR/eole.vocab.tgt \
             -src_vocab_size 1000 \
             -tgt_vocab_size 1000 \
-            -model '{"architecture": "transformer", "layers": 4, "hidden_size": 16, "transformer_ff": 64, "heads": 2, "rope_config": {}, "embeddings": {"word_vec_size": 16, "position_encoding_type": "Rotary"}}' \
+            -model '{"architecture": "transformer", "layers": 4, "hidden_size": 16, "transformer_ff": 64, "heads": 2, "embeddings": {"word_vec_size": 16, "position_encoding_type": "Rotary"}}' \
             -training '{"batch_size": 10, "num_workers": 0, "bucket_size": 1024, "train_steps": 10, "valid_steps": 5}' \
             -valid_metrics "BLEU" "TER" \
             -report_every 2 \

@@ -26,6 +26,7 @@ class Transform(object):
     def __init__(self, config):
         """Initialize Transform by parsing `opts` and add them as attribute."""
         # better segregation/nesting of transform specific stuff in config
+        print(config.transforms_configs)
         self.config = getattr(config.transforms_configs, self.name)
         # set at transform level to save some artifacts to model_path directory
         self.artifacts = []

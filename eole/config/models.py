@@ -11,6 +11,8 @@ import eole
 from eole.constants import PositionEncodingType, ActivationFunction, ModelType
 from eole.config.config import Config
 
+import traceback
+
 
 class EmbeddingsConfig(Config):
     src_word_vec_size: int = Field(
@@ -510,7 +512,7 @@ class BaseModelConfig(Config):
             self.embeddings.position_encoding_type == PositionEncodingType.Rotary
             and not self.rope_config
         ):
-            self.rope_config = RotaryPositionConfig()
+            self.update(rope_config=RotaryPositionConfig())
 
         if self.embeddings is not None and self.embeddings.word_vec_size > 0:
             update_dict["embeddings"] = {
@@ -595,6 +597,9 @@ class BaseModelConfig(Config):
 
     @model_validator(mode="after")
     def _validate_model_config(self):
+        print("############################@")
+        for line in traceback.format_stack():
+            print(line.strip())
         self.update_model_opts()
 
         # encoder and decoder should be same sizes

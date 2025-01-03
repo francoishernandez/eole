@@ -191,13 +191,15 @@ class PredictConfig(
                 model=model_config,
             )
 
-        update_dict =  {}
+        update_dict = {}
 
         if "transforms" not in self.model_fields_set:
             update_dict["transforms"] = transforms
             update_dict["_all_transform"] = transforms
         if "transforms_configs" not in self.model_fields_set:
-            update_dict["transforms_configs"] = NestedAllTransformsConfig(**config_dict.get("transforms_configs", {}))
+            update_dict["transforms_configs"] = NestedAllTransformsConfig(
+                **config_dict.get("transforms_configs", {})
+            )
         if "compute_dtype" not in self.model_fields_set:
             update_dict["compute_dtype"] = config_dict.get("training", {}).get(
                 "compute_dtype", "fp16"
