@@ -164,7 +164,7 @@ class PredictConfig(
             self.__dict__["share_vocab"] = config_dict.get("share_vocab", False)
             # retrieve precision from checkpoint config if not explicitly set
             if "compute_dtype" not in self.model_fields_set:
-                self.compute_dtype = training_config.compute_dtype
+                self.update(compute_dtype=training_config.compute_dtype)
             # quant logic, might be better elsewhere
             if hasattr(
                 training_config, "quant_type"
@@ -187,24 +187,25 @@ class PredictConfig(
                     quant_type=training_config.quant_type,
                 )
 
-            model_config._validate_model_config()
-            # training_config._validate_running_config()  # not sure it's needed
-
             self.update(
                 model=model_config,
             )
 
+        update_dict =  {}
+
         if "transforms" not in self.model_fields_set:
-            self.transforms = self._all_transform = transforms
+            update_dict["transforms"] = transforms
+            update_dict["_all_transform"] = transforms
         if "transforms_configs" not in self.model_fields_set:
-            self.transforms_configs = config_dict.get("transforms_configs", {})
+            update_dict["transforms_configs"] = NestedAllTransformsConfig(**config_dict.get("transforms_configs", {}))
         if "compute_dtype" not in self.model_fields_set:
-            self.compute_dtype = config_dict.get("training", {}).get(
+            update_dict["compute_dtype"] = config_dict.get("training", {}).get(
                 "compute_dtype", "fp16"
             )
         for key, value in config_dict.get("inference", {}).items():
             if key not in self.model_fields_set:
-                setattr(self, key, value)
+                update_dict[key] = value
+        self.update(**update_dict)
 
 
 class BuildVocabConfig(
