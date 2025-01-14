@@ -115,7 +115,10 @@ class ImageTextCorpus(object):
 
     def load(self, offset=0, stride=1):
         def make_ex(item):
-            example = {"text": item["text"], "images": item["images"]}
+            example = {
+                "text": item["text"],
+                "images": item["images"]
+            }
             return example
 
         if isinstance(self.data, list):
@@ -215,24 +218,36 @@ def get_corpora(config, task=CorpusTask.TRAIN, src=None, tgt=None, align=None):
                         corpus_dict.path_align,
                     )
                 else:
-                    corpora_dict[corpus_id] = BlockwiseCorpus(
-                        corpus_id,
-                        corpus_dict.path_txt,
-                        block_size=8192,  # number of characters
-                    )
+                    if config.data_type == "text":
+                        corpora_dict[corpus_id] = BlockwiseCorpus(
+                            corpus_id,
+                            corpus_dict.path_txt,
+                            block_size=8192,  # number of characters
+                        )
+                    elif config.data_type == "image":
+                        corpora_dict[corpus_id] = ImageTextCorpus(
+                            corpus_id,
+                            corpus_dict.path_txt,
+                        )
     elif task == CorpusTask.VALID:
         if CorpusName.VALID in config.data.keys():
             if config.data[CorpusName.VALID].path_tgt is None:
                 path_tgt = config.data[CorpusName.VALID].path_src
             else:
                 path_tgt = config.data[CorpusName.VALID].path_tgt
-            corpora_dict[CorpusName.VALID] = ParallelCorpus(
-                CorpusName.VALID,
-                config.data[CorpusName.VALID].path_src,
-                path_tgt if tgt is None else None,
-                None,
-                config.data[CorpusName.VALID].path_align,
-            )
+            if config.data_type == "text":
+                corpora_dict[CorpusName.VALID] = ParallelCorpus(
+                    CorpusName.VALID,
+                    config.data[CorpusName.VALID].path_src,
+                    path_tgt if tgt is None else None,
+                    None,
+                    config.data[CorpusName.VALID].path_align,
+                )
+            elif config.data_type == "image":
+                corpora_dict[CorpusName.VALID] = ImageTextCorpus(
+                    CorpusName.VALID,
+                    config.data[CorpusName.VALID].path_txt
+                )
         else:
             return None
     else:
@@ -340,6 +355,7 @@ class ImageTextCorpusIterator(object):
             line_number = i * self.stride + self.offset
             example = {
                 "src": text,
+                "tgt": text,
                 "images": {k: v["image"] for k, v in processed_images.items()},
                 "cid": self.cid,
                 "cid_line_number": line_number,

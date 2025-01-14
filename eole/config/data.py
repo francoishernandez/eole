@@ -232,22 +232,22 @@ class DataConfig(VocabConfig):  # , AllTransformsConfig):
                 logger.info(f"Missing transforms field for {cname} data, " f"set to default: {default_transforms}.")
                 corpus.transforms = default_transforms
             # Check path
-            if corpus.path_src is None:
-                raise ValueError(
-                    f"Corpus {cname} src path is required."
-                    "tgt path is also required for non language"
-                    " modeling tasks."
-                )
-            else:
-                self.__class__._validate_file(corpus.path_src, info=f"{cname}/path_src")
-                if corpus.path_tgt is None:
-                    logger.debug("path_tgt is None, it should be set unless the task" " is language modeling")
-                    # tgt is src for LM task
-                    # corpus["path_tgt"] = path_src
-                    corpora[cname] = corpus
-                    # path_tgt = path_src
-                else:
-                    self.__class__._validate_file(corpus.path_tgt, info=f"{cname}/path_tgt")
+            # if corpus.path_src is None:
+            #     raise ValueError(
+            #         f"Corpus {cname} src path is required."
+            #         "tgt path is also required for non language"
+            #         " modeling tasks."
+            #     )
+            # else:
+            #     self.__class__._validate_file(corpus.path_src, info=f"{cname}/path_src")
+            #     if corpus.path_tgt is None:
+            #         logger.debug("path_tgt is None, it should be set unless the task" " is language modeling")
+            #         # tgt is src for LM task
+            #         # corpus["path_tgt"] = path_src
+            #         corpora[cname] = corpus
+            #         # path_tgt = path_src
+            #     else:
+            #         self.__class__._validate_file(corpus.path_tgt, info=f"{cname}/path_tgt")
             if corpus.path_align is None:
                 if hasattr(self, "model") and getattr(getattr(self.model, "decoder", None), "lambda_align", 0.0) > 0.0:
                     raise ValueError(f"Corpus {cname} alignment file path are " "required when lambda_align > 0.0")
