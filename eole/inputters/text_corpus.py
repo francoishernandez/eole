@@ -109,9 +109,10 @@ class ImageTextCorpus(object):
     ```
     """
 
-    def __init__(self, name, data):
+    def __init__(self, name, data, is_train=False):
         self.id = name
         self.data = data
+        self.is_train = is_train
 
     def load(self, offset=0, stride=1):
         def make_ex(item):
@@ -228,6 +229,7 @@ def get_corpora(config, task=CorpusTask.TRAIN, src=None, tgt=None, align=None):
                         corpora_dict[corpus_id] = ImageTextCorpus(
                             corpus_id,
                             corpus_dict.path_txt,
+                            is_train=True
                         )
     elif task == CorpusTask.VALID:
         if CorpusName.VALID in config.data.keys():
@@ -246,7 +248,8 @@ def get_corpora(config, task=CorpusTask.TRAIN, src=None, tgt=None, align=None):
             elif config.data_type == "image":
                 corpora_dict[CorpusName.VALID] = ImageTextCorpus(
                     CorpusName.VALID,
-                    config.data[CorpusName.VALID].path_txt
+                    config.data[CorpusName.VALID].path_txt,
+                    is_train=True
                 )
         else:
             return None
@@ -260,7 +263,7 @@ def get_corpora(config, task=CorpusTask.TRAIN, src=None, tgt=None, align=None):
             )
         elif config.data_type == "image":
             corpora_dict[CorpusName.INFER] = ImageTextCorpus(
-                CorpusName.INFER, src  # maybe homogenize to some better name
+                CorpusName.INFER, src, is_train=False  # maybe homogenize to some better name
             )
     return corpora_dict
 
@@ -331,6 +334,7 @@ class ImageTextCorpusIterator(object):
         skip_empty_level="warning",
         stride=1,
         offset=0,
+        is_train=False,
     ):
         self.cid = corpus.id
         self.corpus = corpus
@@ -340,6 +344,7 @@ class ImageTextCorpusIterator(object):
         self.skip_empty_level = skip_empty_level
         self.stride = stride
         self.offset = offset
+        self.is_train = is_train
 
     def _process(self, stream):
         for i, example in enumerate(stream):
@@ -355,7 +360,7 @@ class ImageTextCorpusIterator(object):
             line_number = i * self.stride + self.offset
             example = {
                 "src": text,
-                "tgt": text,
+                "tgt": text if self.is_train else None,
                 "images": {k: v["image"] for k, v in processed_images.items()},
                 "cid": self.cid,
                 "cid_line_number": line_number,
@@ -390,6 +395,7 @@ def build_corpora_iters(corpora, transforms, corpora_info, skip_empty_level="war
                 skip_empty_level=skip_empty_level,
                 stride=stride,
                 offset=offset,
+                is_train=corpus.is_train,
             )
         corpora_iters[c_id] = corpus_iter
     return corpora_iters

@@ -198,7 +198,7 @@ class GeneratorLM(Inference):
         log_probs, attn = self._decode_and_generate(
             src,
             None,
-            batch,
+            # batch,
             src_len=src_len,
         )
 

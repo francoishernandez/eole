@@ -8,7 +8,7 @@ tgt_vocab_size: 32000
 
 overwrite: true
 
-report_every: 10
+report_every: 1
 
 # transforms config
 # transforms: [sentencepiece, filtertoolong]
@@ -42,8 +42,8 @@ training:
     world_size: 1
     gpu_ranks: [0]
     # 2 GPU
-    # world_size: 2
-    # gpu_ranks: [0, 1]
+    # world_size: 4
+    # gpu_ranks: [0, 1, 2, 3]
     # parallel_mode: tensor_parallel
     dropout_steps: [0]
     dropout: [0.0]

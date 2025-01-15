@@ -491,6 +491,7 @@ class Trainer(object):
                         "Step %d, cuda OOM - batch removed",
                         self.optim.training_step,
                     )
+                    print(trace_content)
                     clear_gpu_cache()
                     if self.n_gpu > 1 and self.parallel_mode == "tensor_parallel":
                         torch.distributed.destroy_process_group()

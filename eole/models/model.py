@@ -518,7 +518,7 @@ class BaseModel(nn.Module):
                 ].size()
             ), (
                 "An error in model's partition and checkpoint's slice was detected, "
-                f"[{name}, {module}, {param_name}, {param.data.size()}, {ckpt_t.size()}]"
+                f"[{name}, {module}, {param_name}, {param.data.size()}, {ckpt_t.size()}, {col_slice_start}, {col_slice_end}, {row_slice_start}, {row_slice_end}]"
             )
             if name + "." + param_name in buf_list:
                 if module.__class__.__name__ == "WQLinear_GEMM":
@@ -545,7 +545,10 @@ class BaseModel(nn.Module):
         else:
             assert (
                 param.data.size() == ckpt_t[col_slice_start:col_slice_end].size()
-            ), "An error in model's partition and checkpoint's slice was detected"
+            ), (
+                "An error in model's partition and checkpoint's slice was detected, "
+                f"{name}, {module}, {param.data.size(), {ckpt_t[col_slice_start:col_slice_end].size()}}"
+            )
             if name + "." + param_name in buf_list:
                 module.register_buffer(param_name, ckpt_t[col_slice_start:col_slice_end])
             else:

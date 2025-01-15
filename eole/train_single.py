@@ -136,9 +136,9 @@ def main(config, device_id):
 
     # Allow only Memory Efficient path for sdpa
     torch.backends.cuda.enable_mem_efficient_sdp(True)
-    torch.backends.cuda.enable_flash_sdp(False)
-    torch.backends.cuda.enable_math_sdp(False)
-    torch.backends.cuda.enable_cudnn_sdp(False)
+    torch.backends.cuda.enable_flash_sdp(True)
+    torch.backends.cuda.enable_math_sdp(True)
+    torch.backends.cuda.enable_cudnn_sdp(True)
 
     # if transform + options set in 'valid' we need to copy in main
     # transform / options for scoring considered as inference

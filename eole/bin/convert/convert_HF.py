@@ -451,7 +451,7 @@ def build_config_dict(hf):
         "left_pad": True,
         "generator_bias": False,
         "rope_config": {
-            "rotary_theta": config.get("rope_theta"),
+            # "rotary_theta": config.get("rope_theta"),
             "rotary_interleave": False,
         },
         "embeddings": {},  # Populated later
@@ -461,7 +461,9 @@ def build_config_dict(hf):
     if model_config["sliding_window"] is None:
         model_config["sliding_window"] = 4096
 
-    # patch rotary_dim
+    # patch rotary
+    if "rotary_theta" in config.keys():
+        model_config["rope_config"]["rotary_theta"] = config["rope_theta"]
     if "rotary_dim" in config.keys():
         model_config["rope_config"]["rotary_dim"] = config["rotary_dim"]
     elif "partial_rotary_factor" in config.keys():
