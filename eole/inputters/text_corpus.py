@@ -118,7 +118,7 @@ class ImageTextCorpus(object):
         def make_ex(item):
             example = {
                 "text": item["text"],
-                "images": item["images"]
+                "images": item.get("images", {})
             }
             return example
 

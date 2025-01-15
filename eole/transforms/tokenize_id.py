@@ -104,7 +104,12 @@ class HuggingfaceTokenizer(IntTokenizerTransform):
             raise ValueError(f"Unsupported src type: {type(example['src'])}")
         example["src_ids"] = src_tokens
         if example.get("tgt", None) is not None:
-            tgt_tokens = self.tokenize_string(" ".join(example["tgt"]), side="tgt")
+            if isinstance(example["tgt"], str):
+                tgt_tokens = self.tokenize_string(example["tgt"], side="tgt")
+            elif isinstance(example["tgt"], list):
+                tgt_tokens = self.tokenize_string(" ".join(example["tgt"]), side="tgt")
+            else:
+                raise ValueError(f"Unsupported tgt type: {type(example['tgt'])}")
             example["tgt_ids"] = tgt_tokens
         return example
 

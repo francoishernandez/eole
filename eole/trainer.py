@@ -453,8 +453,10 @@ class Trainer(object):
 
         for k, batch in enumerate(true_batches):
 
+
             src = batch["src"]
             src_len = batch["srclen"]
+            print("SRCLEN:", src_len)
             if src_len is not None:
                 report_stats.n_src_words += src_len.sum().item()
                 total_stats.n_src_words += src_len.sum().item()

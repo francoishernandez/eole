@@ -1,5 +1,5 @@
-import torch
 import torch.nn as nn
+import torch
 from glob import glob
 from collections import defaultdict
 import os
@@ -946,8 +946,13 @@ class VisionEncoderDecoderModel(BaseModel):
         text_locations = src != self.image_token_id
         image_locations = src == self.image_token_id
         text_features = self.tgt_emb(src[text_locations].view(batch_size, -1))
+        if len(images) == 0:
+            return text_features
         encoded_images = self.encoder(images)
         image_features = self.adapter(encoded_images)
+        # print("TEXT FEATURES:", text_features.size())
+        # print("ENCODED IMAGES:", encoded_images.size())
+        # print("IMAGE FEATURES:", image_features.size())
 
         seq_len = src.shape[1]
         batch, N_txt, D_txt = text_features.shape
@@ -963,7 +968,8 @@ class VisionEncoderDecoderModel(BaseModel):
             device=text_features.device,
         )
         combined_features[text_locations, :] = text_features
-        combined_features[image_locations, :] = image_features
+        if len(images) > 0:
+            combined_features[image_locations, :] = image_features
 
         return combined_features
 
@@ -973,14 +979,21 @@ class VisionEncoderDecoderModel(BaseModel):
 
         if not bptt:
             self.decoder.init_state()
+        print("BEFORE embed_vision_language_features")
         emb = self.embed_vision_language_features(src, images)
         pad_idx = self.tgt_emb.word_padding_idx
         pad_mask = src.eq(pad_idx).unsqueeze(1)  # [B, 1, T_tgt]
+        print("BEFORE rope.update")
         position_embeddings = self.rope.update(emb.size(1), step=0)
+        print("BEFORE decoder")
+        print("TRUNCATE stuff to check memory limit")
+        emb = emb[:,:256,:]
+        pad_mask = pad_mask[:,:,:256]
         dec_out, attns = self.decoder(
             emb,
             enc_out=None,
-            src_len=src_len,
+            # src_len=src_len,
+            src_len=256,
             with_align=with_align,
             tgt_pad_mask=pad_mask,
             position_embeddings=position_embeddings,
